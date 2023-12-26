@@ -1,0 +1,54 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- none
+
+
+parameters:
+  - name: tags
+    type: string
+    displayName: Tags a ejecutar
+  - name: env
+    type: string
+    displayName: Ambiente a ejecutar
+    default: 'uat'
+    values:
+      - 'dev'
+      - 'uat'
+
+variables:
+  - name: vmImage
+    value: 'windows-latest'
+    readonly: true
+
+stages:
+  - stage: Execute_Tests
+    displayName: Execute automated tests
+    jobs:
+      - job: Job
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '11'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+          - script: |
+              cd test_swag_web/auto/Automation_Selenium-MVN-Cucumber
+              mvn clean install -DskipTests
+            displayName: 'Build' 
+          - script: |
+              cd test_swag_web/auto/Automation_Selenium-MVN-Cucumber
+              mvn clean verify "-Dcucumber.filter.tags=${{ parameters.tags }}"
+            displayName: 'Execute Tests' 
+          - task: PublishPipelineArtifact@1
+            condition: always() 
+            inputs:
+              targetPath: '$(Pipeline.Workspace)/s/auto/Automation_Selenium-MVN-Cucumber/target/site/serenity'
+              artifact: 'SerenityReport'
+              publishLocation: 'pipeline'
+            displayName: 'Publish Report'

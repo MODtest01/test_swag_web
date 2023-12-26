@@ -38,11 +38,11 @@ stages:
               jdkArchitectureOption: 'x64'
               jdkSourceOption: 'PreInstalled'
           - script: |
-              cd test_swag_web/auto/Automation_Selenium-MVN-Cucumber
+              cd test_swag_web\auto\Automation_Selenium-MVN-Cucumber
               mvn clean install -DskipTests
             displayName: 'Build' 
           - script: |
-              cd test_swag_web/auto/Automation_Selenium-MVN-Cucumber
+              cd test_swag_web\auto\Automation_Selenium-MVN-Cucumber
               mvn clean verify "-Dcucumber.filter.tags=${{ parameters.tags }}"
             displayName: 'Execute Tests' 
           - task: PublishPipelineArtifact@1
